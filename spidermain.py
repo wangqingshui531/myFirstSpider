@@ -9,6 +9,9 @@ import os
 import mylog
 import details
 import urllib
+import socket
+#urlretrieve超时时间设置为120s
+socket.setdefaulttimeout(120)
 
 targetdir='G:\\behance'
 logger=mylog.log()
@@ -26,13 +29,15 @@ def save_img(src,targetdir):
             os.makedirs(targetdir)
             print("mkdir " + targetdir)
         targetpath = targetdir + '\\' + targetfilename
+        logger.logruninfo(src + ' start copy ')
+        print(src)
         urllib.request.urlretrieve(src,filename=targetpath)
-        logger.logruninfo(src + ' copy to ' + targetpath)
+        logger.logruninfo(src + ' already is copyed to ' + targetpath )
     except IOError as e:
         print("IOERROR")
         print(e)
     except Exception as e:
-        print("Exception")
+        print("Exception111234\n")
         print(e)
 
 def spidermain():
@@ -46,6 +51,7 @@ def spidermain():
         driver = webdriver.Firefox()
         start = time.time()
         driver.get('https:\\www.behance.net')
+        time.sleep(120)
         #loc = (By.ID, 'site-content')
         loc = (By.XPATH, '/html/body/div[1]/div[2]/div[2]/div[2]/div/div/span/a')
         wait = WebDriverWait(driver, timeout)
@@ -53,7 +59,6 @@ def spidermain():
         # WebDriverWait(driver,10).until(EC.text_to_be_present_in_element((By.ID,"//*[@id='showAlt']"),u'设置'))
         print("111===========" + str(len(list)))
         i = 1;
-        time.sleep(30)
         hreflist=[]
         for element in list:
             href = element.get_attribute("href")
@@ -81,7 +86,11 @@ def spidermain():
                 print("wait util svg ok....")
                 imglist = []
                 imglist = driver.find_elements_by_xpath('//img')
-                print("how many pic : " + str(len(imglist)))
+                if imglist != None:
+                    print("how many pic : " + str(len(imglist)))
+                else:
+                    print("imglist is empty")
+
                 logger.logruninfo("wait until :" + detailpageurl + " " + str(len(imglist)))
                 time.sleep(10)
                 srclist=[]
@@ -96,7 +105,9 @@ def spidermain():
                     save_img(src, targetdir + "\\" + subdirname)
                     time.sleep(1)
                     print("spend time " + str(time.time() - start) + "s")
+                print("detailpage complete. log detail.....")
                 detailmgr.adddetails(detailpageurl)
+                print("detailpage log complete,sleep 60")
 
                 #国外网站需要慢速下载，否则报错
                 time.sleep(60)

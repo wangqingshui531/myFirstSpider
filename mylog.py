@@ -13,7 +13,7 @@ class log:
 
     def logruninfo(self,info):
         self.fo = open(self.filename, "a+")
-        strcurtime = time.strftime("%D%H%M%S", time.localtime())
+        strcurtime = time.strftime("%D %H%M%S", time.localtime())
         message = str(strcurtime) + " " + info + "\n"
         self.fo.write(message)
         self.fo.close()
